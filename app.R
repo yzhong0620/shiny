@@ -1,5 +1,6 @@
 library(tidyverse)
 library(shiny)
+library(bslib)
 
 nominees <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-09-21/nominees.csv')
 
@@ -9,6 +10,14 @@ catties <- nominees %>%
   pull(category)
 
 ui <- fluidPage(
+  theme = bs_theme(primary = "#ADD8E6", 
+                   secondary = "#FFEBCD", 
+                   base_font = list(font_google("Raleway"), "-apple-system", 
+                                    "BlinkMacSystemFont", "Segoe UI", "Helvetica Neue", "Arial", 
+                                    "sans-serif", "Apple Color Emoji", "Segoe UI Emoji", 
+                                    "Segoe UI Symbol"), 
+                   bootswatch = "spacelab"),
+  
   # Application title
   titlePanel("Update the distributor within a category"),
   
@@ -58,11 +67,13 @@ server <- function(input, output) {
     req(input$distributor)
     cat_distributor() %>% 
       group_by(distributor) %>% 
-      summarize(tot_count = n()) %>% 
+      summarize(tot_count = n(),
+                winner = ifelse(sum(type == "Winner") == 1, "Yes", "No")) %>% 
       ggplot(aes(y = fct_reorder(distributor, tot_count),
-                 x = tot_count)) +
+                 x = tot_count,
+                 fill = winner)) +
       geom_col() +
-      labs(title = paste("Total count", input$cat, "distributors"),
+      labs(title = paste("Total count of nominees under", input$cat, "for each distributor"),
            x = "",
            y = "")
   })
