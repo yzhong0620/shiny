@@ -68,7 +68,7 @@ server <- function(input, output) {
     cat_distributor() %>% 
       group_by(distributor) %>% 
       summarize(tot_count = n(),
-                winner = ifelse(sum(type == "Winner") == 1, "Yes", "No")) %>% 
+                winner = ifelse(sum(type == "Winner") == 0, "No", "Yes")) %>% 
       ggplot(aes(y = fct_reorder(distributor, tot_count),
                  x = tot_count,
                  fill = winner)) +
